@@ -1,0 +1,34 @@
+name: Run strava2gsheets Job
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    needs: go-lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.23
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run Go code
+        run: go run cmd/strava2gsheets/main.go
+        env:
+          GSHEETS_SERVICE_PRIVATE_KEY: ${{ secrets.GSHEETS_SERVICE_PRIVATE_KEY }}
+          GSHEETS_SERVICE_SPREADSHEET_ID: ${{ secrets.GSHEETS_SERVICE_SPREADSHEET_ID }}
+          GSHEETS_SERVICE_PRIVATE_KEY_ID: ${{ secrets.GSHEETS_SERVICE_PRIVATE_KEY_ID }}
+          GSHEETS_SERVICE_EMAIL: ${{ secrets.GSHEETS_SERVICE_EMAIL }}
+          STRAVA_SERVICE_CLIENT_ID: ${{ secrets.STRAVA_SERVICE_CLIENT_ID }}
+          STRAVA_SERVICE_CLIENT_SECRET: ${{ secrets.STRAVA_SERVICE_CLIENT_SECRET }}
+          STRAVA_SERVICE_REFRESH_TOKEN: ${{ secrets.STRAVA_SERVICE_REFRESH_TOKEN }}

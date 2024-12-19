@@ -1,0 +1,37 @@
+name: Go Lint and Dev Test
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+
+jobs:
+  go-lint:
+    uses: ./.github/workflows/go-lint.yml
+
+  run-dev:
+    runs-on: ubuntu-latest
+    needs: go-lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.23
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run strava2gsheets in DEV
+        run: go run cmd/strava2gsheets/main.go
+        env:
+          GSHEETS_SERVICE_PRIVATE_KEY: ${{ secrets.GSHEETS_SERVICE_PRIVATE_KEY }}
+          GSHEETS_SERVICE_SPREADSHEET_ID: ${{ secrets.GSHEETS_SERVICE_SPREADSHEET_ID_DEV }}
+          GSHEETS_SERVICE_PRIVATE_KEY_ID: ${{ secrets.GSHEETS_SERVICE_PRIVATE_KEY_ID }}
+          GSHEETS_SERVICE_EMAIL: ${{ secrets.GSHEETS_SERVICE_EMAIL }}
+          STRAVA_SERVICE_CLIENT_ID: ${{ secrets.STRAVA_SERVICE_CLIENT_ID }}
+          STRAVA_SERVICE_CLIENT_SECRET: ${{ secrets.STRAVA_SERVICE_CLIENT_SECRET }}
+          STRAVA_SERVICE_REFRESH_TOKEN: ${{ secrets.STRAVA_SERVICE_REFRESH_TOKEN }}
