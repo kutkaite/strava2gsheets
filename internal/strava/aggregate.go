@@ -20,13 +20,13 @@ func AggregatePerDay(activities []ActivitiesResponse) []ActivityAgg {
 		if val, ok := aggDay[day]; ok {
 			aggDay[day] = ActivityAgg{
 				TrainingDate: activity.StartDateLocal,
-				Duration:     val.Duration + int64(activity.ElapsedTime),
+				Duration:     val.Duration + int64(activity.MovingTime),
 				Distance:     val.Distance + activity.Distance,
 			}
 		} else {
 			aggDay[day] = ActivityAgg{
 				TrainingDate: activity.StartDateLocal,
-				Duration:     int64(activity.ElapsedTime),
+				Duration:     int64(activity.MovingTime),
 				Distance:     activity.Distance,
 			}
 		}
